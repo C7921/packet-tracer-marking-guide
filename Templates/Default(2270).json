@@ -1,0 +1,398 @@
+{
+  "TemplateName": "Packet Tracer Network Design",
+  "TemplateVersion": "1.0",
+  "TemplateDescription": "Standard assessment template for network design using Cisco Packet Tracer",
+  "Categories": [
+    {
+      "ID": "SiteCreation",
+      "DisplayName": "Site Creation and Structure",
+      "Description": "Verifies correct number of sites and PC implementation",
+      "VerificationSteps": [
+        "Open the student's .pka file in Packet Tracer",
+        "Switch to Logical View if not already active (View menu → Logical)",
+        "Count the separate network segments visible in the topology",
+        "Verify each site has a switch connecting multiple PCs",
+        "Check for labels or naming conventions that identify sites"
+      ],
+      "CheckForItems": [
+        "Client sites plus 1 data centre site"
+      ],
+      "Questions": [
+        {
+          "ID": "correct_sites",
+          "Question": "Has the student created the correct number of sites?",
+          "HelpText": "Count all separate network segments. Look for:\n- Clear separation between sites (usually indicated by routers connecting segments)\n- Each site should have a switch connecting multiple PCs\n- The data centre should have a server device connected to its switch"
+        },
+        {
+          "ID": "correct_naming",
+          "Question": "Does the student follow the correct PC naming/numbering convention?",
+          "HelpText": "For sites with >3 users, only PC1, PC2, and PCn should be created where n is max PC number.\nExample: If site 4 has 7 users, only 'Site4-PC1', 'Site4-PC2', and 'Site4-PC7' should exist.\nTo check PC names in Packet Tracer:\n1. Click on each PC device\n2. Look at the device name in the bottom left corner or Config tab → Global Settings"
+        },
+        {
+          "ID": "logical_view",
+          "Question": "Have the PCs been placed in the logical view (not physical)?",
+          "HelpText": "The assignment requires using logical view rather than physical view.\nTo verify:\n1. Check if the current view is logical (View menu → check if Logical is selected)\n2. If in physical view, switch to logical view and verify all devices are properly arranged"
+        }
+      ],
+      "SuccessMessages": {
+        "correct_sites": "Student has created the correct number of sites.",
+        "correct_naming": "Sites follow the correct PC naming/numbering convention.",
+        "logical_view": "Student has used the logical view as required."
+      },
+      "ErrorMessages": {
+        "correct_sites": "Student has not created the required number of sites.",
+        "correct_naming": "Sites do not follow the correct PC naming/numbering convention.",
+        "logical_view": "Student has not used the logical view."
+      },
+      "HintMessages": {
+        "correct_sites": "Check for client sites plus 1 data centre site.\nSome students may have also added more data centres/servers than required.",
+        "correct_naming": "For sites with >3 users, only PC1, PC2, and PCn should be created.",
+        "logical_view": "The assignment specifically requires using logical view, not physical view."
+      }
+    },
+    {
+      "ID": "SiteConnectivity",
+      "DisplayName": "Internal Site Connectivity",
+      "Description": "Assesses internal connectivity within sites",
+      "VerificationSteps": [
+        "For each site, check that PCs are connected to switches",
+        "Verify appropriate devices (switches) are used within each site",
+        "Test if PCs within the same site can communicate with each other"
+      ],
+      "Questions": [
+        {
+          "ID": "appropriate_devices",
+          "Question": "Are the PCs within each site connected using appropriate devices?",
+          "HelpText": "Verify that within each site:\n1. All PCs are connected to switch(es)\n2. Switches are used for LAN connectivity (not hubs or routers)\n3. Connections use appropriate media (typically FastEthernet)"
+        },
+        {
+          "ID": "internal_communication",
+          "Question": "Can PCs within the same site communicate with each other?",
+          "HelpText": "To test internal site connectivity in Packet Tracer:\n1. Click on a PC within a site\n2. Open Command Prompt (Desktop tab → Command Prompt)\n3. Use the ping command to test connectivity to another PC in the same site:\n   C:\\> ping [IP address of another PC in the same site]\n4. Successful pings will show 'Reply from [IP]...'\n5. Test at least one site to confirm internal connectivity"
+        }
+      ],
+      "SuccessMessages": {
+        "appropriate_devices": "PCs within sites are connected using appropriate devices.",
+        "internal_communication": "PCs within the same site can communicate with each other."
+      },
+      "ErrorMessages": {
+        "appropriate_devices": "PCs within sites are not connected using appropriate devices.",
+        "internal_communication": "PCs within the same site cannot communicate with each other."
+      },
+      "HintMessages": {
+        "appropriate_devices": "Check if switches or other appropriate layer 2 devices are used within each site.",
+        "internal_communication": "Check IP addressing, subnet masks, and connectivity between devices."
+      }
+    },
+    {
+      "ID": "DataCentre",
+      "DisplayName": "Data Centre Configuration",
+      "Description": "Evaluates server implementation and configuration",
+      "VerificationSteps": [
+        "Locate the data centre site in the topology",
+        "Verify that at least one server device is present",
+        "Check if HTTP service is enabled on the server",
+        "Verify appropriate intermediate devices connect the server"
+      ],
+      "Questions": [
+        {
+          "ID": "data_centre_exists",
+          "Question": "Has a data centre site been created?",
+          "HelpText": "To identify the data centre:\n1. Look for a network segment containing server device(s)\n2. May be labeled as 'Data Centre' or similar\n3. Should be separated from other sites, connected via a router"
+        },
+        {
+          "ID": "server_exists",
+          "Question": "Is there a server in the data centre?",
+          "HelpText": "To verify server presence:\n1. Look for 'Server-PT' device in the data centre\n2. Click on the device to confirm it's a server"
+        },
+        {
+          "ID": "http_configured",
+          "Question": "Is the server correctly configured for HTTP service?",
+          "HelpText": "To check HTTP service configuration:\n1. Click on the server device to select it\n2. Click on the 'Config' tab in the right panel\n3. Navigate to the 'Services' section\n4. Check if HTTP service is enabled (should be 'On')\n5. If not enabled, it should show HTTP with an 'Off' status"
+        },
+        {
+          "ID": "appropriate_devices",
+          "Question": "Are appropriate intermediate devices used to connect the server?",
+          "HelpText": "To verify intermediate devices:\n1. Check if the server is connected to a switch (not directly to a router)\n2. Verify the data centre switch is connected to a router for WAN connectivity\n3. Check if appropriate cabling is used (typically FastEthernet or GigabitEthernet)"
+        }
+      ],
+      "SuccessMessages": {
+        "data_centre_exists": "Data centre site has been created.",
+        "server_exists": "Server has been added to the data centre.",
+        "http_configured": "Server is correctly configured for HTTP service.",
+        "appropriate_devices": "Appropriate intermediate devices are used in the data centre."
+      },
+      "ErrorMessages": {
+        "data_centre_exists": "Data centre site has not been created.",
+        "server_exists": "Server has not been added to the data centre.",
+        "http_configured": "Server is not correctly configured for HTTP service.",
+        "appropriate_devices": "Appropriate intermediate devices are not used in the data centre."
+      },
+      "HintMessages": {
+        "data_centre_exists": "The requirement specifies a site for the company data centre.",
+        "server_exists": "A server should be added using Packet Tracer's server objects.",
+        "http_configured": "HTTP should be enabled in the Services menu of the server.",
+        "appropriate_devices": "Check if the server is connected using appropriate network devices."
+      }
+    },
+    {
+      "ID": "WANConnectivity",
+      "DisplayName": "WAN Connectivity",
+      "Description": "Checks inter-site connections and appropriate technologies",
+      "VerificationSteps": [
+        "Examine connections between sites (router-to-router connections)",
+        "Verify connection types are either Fiber or Serial (per requirements)",
+        "Check interface configurations on routers",
+        "Verify complete connectivity between all sites",
+        "Check for redundant WAN links or fault tolerance features"
+      ],
+      "Questions": [
+        {
+          "ID": "wan_connections",
+          "Question": "Are the sites connected using WAN connections?",
+          "HelpText": "To check WAN connections:\n1. Look for router-to-router connections between sites\n2. Verify each site has at least one connection to another site\n3. Ensure there are no isolated sites"
+        },
+        {
+          "ID": "correct_wan_type",
+          "Question": "Are the WAN connections using Fiber or Serial as specified?",
+          "HelpText": "To verify connection types:\n1. Click on a connection line between routers\n2. A popup will appear showing the connection type\n3. Verify it's either Fiber or Serial (acceptable types per requirements)\n4. Copper connections between sites are NOT acceptable per requirements\n\nAlternatively, check router interfaces:\nRouter> enable\nRouter# show ip interface brief\n# Look for Serial0/x/x or GigabitEthernet0/x interfaces"
+        },
+        {
+          "ID": "wan_devices",
+          "Question": "Are appropriate intermediate devices used for WAN connections?",
+          "HelpText": "Appropriate WAN devices include:\n1. Routers at each site connecting to other sites\n2. The right interface modules for the connection type (serial/fiber)\n\nTo check router interface configuration:\nRouter> enable\nRouter# show ip interface brief\n# Check if interfaces are 'up' and have IP addresses assigned"
+        }
+      ],
+      "SuccessMessages": {
+        "wan_connections": "Sites are connected using WAN connections.",
+        "correct_wan_type": "WAN connections use the correct technologies (Fiber or Serial).",
+        "wan_devices": "Appropriate intermediate devices are used for WAN connections."
+      },
+      "ErrorMessages": {
+        "wan_connections": "Sites are not connected using WAN connections.",
+        "correct_wan_type": "WAN connections do not use the correct technologies.",
+        "wan_devices": "Appropriate intermediate devices are not used for WAN connections."
+      },
+      "HintMessages": {
+        "wan_connections": "Check if the sites are connected through WAN links.",
+        "correct_wan_type": "The specification requires either Fiber or synchronous serial connections.",
+        "wan_devices": "Check if routers or other appropriate devices are used for WAN connectivity."
+      }
+    },
+    {
+      "ID": "DeviceConfiguration",
+      "DisplayName": "Intermediate Device Configuration",
+      "Description": "Assesses routing configuration and traffic forwarding",
+      "VerificationSteps": [
+        "Check routing protocol configuration on routers",
+        "Verify interface configurations for proper traffic forwarding",
+        "Check routing tables to confirm all networks are reachable",
+        "Test inter-site connectivity"
+      ],
+      "Questions": [
+        {
+          "ID": "proper_config",
+          "Question": "Are the intermediate devices properly configured for traffic forwarding?",
+          "HelpText": "To check routing configuration:\n1. Click on a router and select CLI tab\n2. Enter these commands to check routing configuration:\nRouter> enable\nRouter# show ip protocols\n   (Shows if RIP, OSPF, EIGRP, etc. is configured)\nRouter# show ip route\n   (Shows routing table with routes to all networks)"
+        },
+        {
+          "ID": "route_traffic",
+          "Question": "Can traffic flow between different sites?",
+          "HelpText": "To test inter-site connectivity:\n1. Select a PC in one site\n2. Open Command Prompt (Desktop tab → Command Prompt)\n3. Ping a device in another site:\nC:\\> ping [IP address of device in another site]\n\nAlternative method using Simulation mode:\n1. Click on the 'Simulation' tab at the bottom right\n2. Click on a source device\n3. Select 'Simple PDU' from the right panel\n4. Click on a destination device in another site\n5. Click 'Capture/Forward' to see if the packet reaches its destination"
+        },
+        {
+          "ID": "no_routing_issues",
+          "Question": "Are there any routing or switching issues?",
+          "HelpText": "Common routing/switching issues to check for:\n1. Missing routes in routing tables (check with 'show ip route')\n2. Inconsistent routing protocols across routers\n3. Interface status issues (down/down or administratively down)\n4. Mismatched IP addressing on WAN links\n5. Incorrect subnet masks"
+        }
+      ],
+      "SuccessMessages": {
+        "proper_config": "Intermediate devices are properly configured for traffic forwarding.",
+        "route_traffic": "Traffic can flow between different sites.",
+        "no_routing_issues": "No routing or switching issues detected."
+      },
+      "ErrorMessages": {
+        "proper_config": "Intermediate devices are not properly configured for traffic forwarding.",
+        "route_traffic": "Traffic cannot flow between different sites.",
+        "no_routing_issues": "Routing or switching issues detected."
+      },
+      "HintMessages": {
+        "proper_config": "Check routing tables, interface configurations, and network addressing.",
+        "route_traffic": "Test connectivity between devices in different sites.",
+        "no_routing_issues": "Identify specific issues in the routing or switching configuration."
+      }
+    },
+    {
+      "ID": "WebServerAccess",
+      "DisplayName": "Web Server Access",
+      "Description": "Verifies accessibility of the web server from all sites",
+      "VerificationSteps": [
+        "Identify the web server's IP address in the data centre",
+        "Test access to the web server from PCs in different sites",
+        "Verify that web pages load successfully"
+      ],
+      "Questions": [
+        {
+          "ID": "server_access",
+          "Question": "Can all PCs across all sites access the web server?",
+          "HelpText": "To test web server access:\n1. Identify the web server's IP address (click on server → Config tab)\n2. From a client PC in any site:\n   a. Click on the PC\n   b. Click on the 'Desktop' tab\n   c. Click on the 'Web Browser' icon\n   d. Enter the URL: http://[server-IP-address]\n   e. Click 'Go' or press Enter\n3. A successful connection will display a web page\n4. Test from at least one PC in each site\n\nAlternative test using ping:\nC:\\> ping [server-IP-address]"
+        },
+        {
+          "ID": "intranet_config",
+          "Question": "Is the server accessibility correctly configured as an intranet server?",
+          "HelpText": "The web server should be configured as an intranet server, meaning:\n1. It should be accessible from all internal sites\n2. It should NOT be accessible from outside the company network\n   (Note: In Packet Tracer, this is generally implied if there's no\n    external connection to the internet in the topology)"
+        }
+      ],
+      "SuccessMessages": {
+        "server_access": "All PCs can access the web server.",
+        "intranet_config": "Server accessibility is correctly configured as an intranet server."
+      },
+      "ErrorMessages": {
+        "server_access": "Not all PCs can access the web server.",
+        "intranet_config": "Server accessibility is not correctly configured as an intranet server."
+      },
+      "HintMessages": {
+        "server_access": "Test HTTP connectivity from each site to the data centre server.",
+        "intranet_config": "The server should not be accessible from outside the client's network."
+      }
+    },
+    {
+      "ID": "OverallImplementation",
+      "DisplayName": "Overall Implementation and Design",
+      "Description": "Evaluates design quality, scalability and networking knowledge",
+      "VerificationSteps": [
+        "Evaluate the overall network topology design (efficiency, organisation)",
+        "Check for redundant links and scalability features",
+        "Assess the implementation of networking best practices"
+      ],
+      "Questions": [
+        {
+          "ID": "efficient_design",
+          "Question": "Is the network design efficient and well-organised?",
+          "HelpText": "Efficient network design characteristics:\n1. Logical topology layout (easy to identify sites and connections)\n2. Appropriate network hierarchy (core, distribution, access layers)\n3. Efficient use of IP address space\n4. Well-organised device placement and labeling\n5. No unnecessary devices or connections"
+        },
+        {
+          "ID": "scalable_design",
+          "Question": "Is the implementation scalable for future growth?",
+          "HelpText": "Scalability features to look for:\n1. Subnet sizing that allows for 20% growth at each site\n2. Topology that allows adding new sites (e.g., hierarchical design)\n3. Routing protocol that can adapt to network changes\n4. Space for additional servers in the data centre subnet\n5. Consideration for two additional future sites"
+        },
+        {
+          "ID": "networking_understanding",
+          "Question": "Does the implementation demonstrate understanding of networking concepts?",
+          "HelpText": "Look for evidence of networking knowledge such as:\n1. Proper use of routing protocols (RIP, OSPF, EIGRP)\n2. Appropriate device selection for different network functions\n3. Correct subnetting and addressing scheme\n4. Logical network topology design\n5. Separation of network functions (LAN vs WAN)\n6. Implementation of redundancy where appropriate"
+        }
+      ],
+      "SuccessMessages": {
+        "efficient_design": "Network design is efficient and well-organised.",
+        "scalable_design": "Implementation is scalable for future growth.",
+        "networking_understanding": "Implementation demonstrates understanding of networking concepts."
+      },
+      "ErrorMessages": {
+        "efficient_design": "Network design could be more efficient and better organised.",
+        "scalable_design": "Implementation may not be sufficiently scalable.",
+        "networking_understanding": "Implementation shows limited understanding of networking concepts."
+      },
+      "HintMessages": {
+        "efficient_design": "Consider how the network topology could be improved.",
+        "scalable_design": "Consider how additional sites or users could be added to the network.",
+        "networking_understanding": "Consider whether the design shows proper application of networking principles."
+      }
+    }
+  ],
+  "StarRatingGuide": {
+    "5": {
+      "Label": "Excellent implementation meeting all requirements",
+      "Criteria": [
+        "All sites + data centre properly created and configured",
+        "Correct PC implementation (PC1, PC2, PCn only)",
+        "Dynamic routing protocol properly implemented",
+        "Redundant WAN links for fault tolerance",
+        "Web server accessible from all sites",
+        "WAN subnets properly sized and documented",
+        "Full connectivity between all sites"
+      ]
+    },
+    "4": {
+      "Label": "Good implementation with minor issues",
+      "Criteria": [
+        "All sites created and configured",
+        "Dynamic routing implemented but may not be optimised",
+        "May lack redundant links OR have PC implementation issues",
+        "Web server accessible from all sites",
+        "Full connectivity between all sites"
+      ]
+    },
+    "3": {
+      "Label": "Functional implementation with significant issues",
+      "Criteria": [
+        "All sites created",
+        "Basic routing implemented (static or dynamic)",
+        "Multiple shortcomings in design (PC issues, lack of redundancy)",
+        "Web server accessible but may have issues from some sites",
+        "Basic connectivity works between most sites"
+      ]
+    },
+    "2": {
+      "Label": "Basic implementation with major issues",
+      "Criteria": [
+        "Sites created but may be missing some",
+        "Basic connectivity established but significant issues",
+        "Static routing only or problematic dynamic routing",
+        "Limited functionality"
+      ]
+    },
+    "1": {
+      "Label": "Minimal implementation",
+      "Criteria": [
+        "Few changes from the template",
+        "Major elements missing or non-functional",
+        "Basic structure only"
+      ]
+    }
+  },
+  "CommandReferences": {
+    "Router": {
+      "Basic": [
+        {"Command": "Router> enable", "Description": "Enter privileged mode"},
+        {"Command": "Router# show running-config", "Description": "View current configuration"},
+        {"Command": "Router# show ip interface brief", "Description": "Quick view of interfaces and status"},
+        {"Command": "Router# show ip route", "Description": "View routing table"},
+        {"Command": "Router# show ip protocols", "Description": "View active routing protocols"}
+      ],
+      "Interface": [
+        {"Command": "Router# show interfaces", "Description": "Detailed interface information"},
+        {"Command": "Router# show interface Serial0/0/0", "Description": "Specific interface details"},
+        {"Command": "Router# show running-config interface Serial0/0/0", "Description": "Configuration for specific interface"}
+      ],
+      "RIP": [
+        {"Command": "Router# show ip rip database", "Description": "View RIP route database"},
+        {"Command": "Router# show running-config | section router rip", "Description": "View RIP configuration"}
+      ],
+      "OSPF": [
+        {"Command": "Router# show ip ospf neighbor", "Description": "View OSPF neighbors"},
+        {"Command": "Router# show ip ospf interface", "Description": "View OSPF interface details"},
+        {"Command": "Router# show running-config | section router ospf", "Description": "View OSPF configuration"}
+      ],
+      "EIGRP": [
+        {"Command": "Router# show ip eigrp neighbors", "Description": "View EIGRP neighbors"},
+        {"Command": "Router# show ip eigrp topology", "Description": "View EIGRP topology table"},
+        {"Command": "Router# show running-config | section router eigrp", "Description": "View EIGRP configuration"}
+      ]
+    },
+    "PC": {
+      "Basic": [
+        {"Command": "C:\\> ipconfig", "Description": "View IP configuration"},
+        {"Command": "C:\\> ping [ip-address]", "Description": "Test connectivity to another device"},
+        {"Command": "C:\\> tracert [ip-address]", "Description": "Trace route to destination"}
+      ]
+    }
+  },
+  "ProjectRequirements": {
+    "NumSites": 6,
+    "DataCentre": 1,
+    "PCConvention": "For sites with >3 users, only PC1, PC2, and PCn should be created where n is max PC number",
+    "ViewMode": "Logical",
+    "WANConnections": ["Fibre", "Serial"],
+    "ServerServices": ["HTTP"]
+  }
+}
