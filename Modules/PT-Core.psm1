@@ -3,7 +3,7 @@
 
 # Script configuration hashtable
 $script:config = @{
-    TemplateName = "Default Packet Tracer Assessment"
+    TemplateName = "Default 2270 Packet Tracer Assessment"
     Template = "Static"
     Categories = @()
     StarRatingGuide = @{}
@@ -55,7 +55,7 @@ function Load-AssessmentTemplate {
     }
 }
 
-# Initialize a new assessment
+# Initialise a new assessment
 function Initialise-Assessment {
     param(
         [string]$StudentName,

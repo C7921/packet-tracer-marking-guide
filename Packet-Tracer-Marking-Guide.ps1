@@ -5,7 +5,7 @@
     Script guides markers through evaluating student Packet Tracer submissions.
     Expanded details for instructions and command references for Packet Tracer.
 .NOTES
-    Version: 2.0
+    Version: 3.0
 #>
 
 # Import Modules
@@ -18,7 +18,7 @@
 # $modulePath = Join-Path -Path $PSScriptRoot -ChildPath "Modules" 
 
 # Import all modules in the Modules directory
-function Import-Module{
+function Import-PTModule{
     param([string]$moduleName)
 
     $modulePath = Join-Path -Path $PSScriptRoot -ChildPath "Modules\$ModuleName.psm1"
@@ -27,9 +27,21 @@ function Import-Module{
 
     if(Test-Path $modulePath) {
        try {
-        Import-Module $modulePath -Force -DisableNameChecking
-        Write-Host "Successfully imported module: $modulePath" -ForegroundColor Green
-        return $true
+         Microsoft.PowerShell.Core\Import-Module $modulePath -Force -DisableNameChecking -Global # -Verbose
+        # Import-Module $modulePath -Force -DisableNameChecking -Global -Verbose
+        
+        # Check module successfully imported
+        $loadedModule =  Get-Module | Where-Object { $_.Path -eq $modulePath }
+        if($loadedModule) {
+            Write-Host "Successfully imported module: $modulePath" -ForegroundColor Green
+                # Debug - List Export Functions
+                # $exportedCommands = Get-Command -Module $loadedModule.Name
+                # Write-Host "Exported functions: $($exportedCommands | ForEach-Object { $_.Name })" -ForegroundColor Green 
+            return $true
+            } else {
+                Write-Host "Failed to import module: $modulePath" -ForegroundColor Red
+                return $false
+            }
        } catch {
         Write-Host "Error importing module: $modulePath" -ForegroundColor Red
         return $false
@@ -42,24 +54,23 @@ function Import-Module{
 
 # Load Modules
 $modulesLoaded  = $true
-$modulesLoaded = $modulesLoaded -and (Import-Module -ModuleName "PT-Core")
-$modulesLoaded = $modulesLoaded -and (Import-Module -ModuleName "PT-UI")
-$modulesLoaded = $modulesLoaded -and (Import-Module -ModuleName "PT-Evaluation")
-$modulesLoaded = $modulesLoaded -and (Import-Module -ModuleName "PT-Reference")
-$modulesLoaded = $modulesLoaded -and (Import-Module -ModuleName "PT-Reporting")
+$modulesLoaded = $modulesLoaded -and (Import-PTModule -ModuleName "PT-Core")
+$modulesLoaded = $modulesLoaded -and (Import-PTModule -ModuleName "PT-UI")
+$modulesLoaded = $modulesLoaded -and (Import-PTModule -ModuleName "PT-Evaluation")
+$modulesLoaded = $modulesLoaded -and (Import-PTModule -ModuleName "PT-Reference")
+$modulesLoaded = $modulesLoaded -and (Import-PTModule -ModuleName "PT-Reporting")
 
 # Final check - make sure loaded correctly
 if(-not $modulesLoaded) {
     Write-Host "One or more modules failed to load. Exiting..." -ForegroundColor Red
     Exit 1
-}
-
+} 
 
 function Show-MainMenu {
     Initialise-Template
     
     do {
-        Clear-Host
+        # Clear-Host
         Write-Header "Packet Tracer Evaluation Menu"
         Write-Info "Current Template: $($script:config.TemplateName)"
         
@@ -117,10 +128,25 @@ function Show-ReferenceOptions {
 
 # Initialise template
 function Initialise-Template {
-    if (-not $script:config -or -not $script:config.TemplateName) {
-        $defaultTemplatePath = Join-Path -Path $PSScriptRoot -ChildPath "Templates\Default(2270).json"
-        if (Test-Path $defaultTemplatePath) {
+   if(-not $script:config -or -not $script:config.TemplateName){
+    # check if exists
+    $defaultTemplatePath = Join-Path -Path $PSScriptRoot -ChildPath "Templates\Default(2270).json"
+    Write-Host "Looking for template at: $defaultTemplatePath" -ForegroundColor Yellow
+    if (Test-Path $defaultTemplatePath) {
+        try {
             Load-AssessmentTemplate -Path $defaultTemplatePath
+        } catch {
+            Write-Host "Error loading template: $_" -ForegroundColor Red
+            Write-Host "Please check the template file and try again. Make sure function is exported." -ForegroundColor Red
+        } 
+        # Check if function is available
+        if (Get-Command -Name "Load-AssessmentTemplate" -ErrorAction SilentlyContinue) {
+            Write-Host "Function Exists but cannot be called. Module Scope issues?" -ForegroundColor Yellow
+        } else {
+            Write-Host "Load-AssessmentTemplate not found. Ensure properly exported from PT-Core.psm1 " -ForegroundColor Red
+        }
+    } else {
+        Write-Host "Template file not found: $defaultTemplatePath" -ForegroundColor Red
         }
     }
 }
@@ -134,7 +160,7 @@ function Process-MenuChoice {
     
     switch ($Choice) {
         # Assessment
-        "1" { Initialise-Evaluation }
+        "1" { Initialise-Assessment}
         "2" { Invoke-CategoryEvaluation -CategoryID "SiteCreation" }
         "3" { Invoke-CategoryEvaluation -CategoryID "SiteConnectivity" }
         "4" { Invoke-CategoryEvaluation -CategoryID "DataCentre" }
