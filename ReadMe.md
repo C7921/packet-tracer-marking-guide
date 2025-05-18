@@ -1,4 +1,4 @@
-# Packet Tracer Marking Guide
+# Packet Tracer Marking Guide - Modular
 
 PowerShell based application designed to guide markers through student submitted Packet Tracer files. Attempts to help standardise the assessment process with detailed steps and generate a consistent feedback file.
 
@@ -32,9 +32,9 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
     * Assign star rating (1-5)
     * Add feedback comments (optional, but recommended)
 
-4. Repeat steps for next student.
 5. Generate summary reports
 6. Export reports - Creates file with student ID.
+7. Initalise new student details to repeat the process
 
 ## Assessment Categories
 
@@ -46,3 +46,18 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 6. Web Server Access - Check web server access from sites
 7. Overall Implementation - Evaluate design quality, scalability, and networking knowledge.
 
+---
+
+## Module Structure
+
+Main Script: `Packet-Tracer-Marking-Guide.ps1` - Entry point that coordinates all modules
+
+Core Module: `PT-Core.psm1` - Handles initialisation and data management
+
+UI Module: `PT-UI.psm1` - Provides user interface functions
+
+Evaluation Module: `PT-Evaluation.psm1` - Contains assessment logic for different categories
+
+Reference Module: `PT-Reference.psm1` - Provides help documentation and reference materials
+
+Reporting Module: `PT-Reporting.psm1` - Generates and exports assessment reports

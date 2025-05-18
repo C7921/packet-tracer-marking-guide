@@ -1,6 +1,11 @@
 # All evaluation logic for different categories
 
 function Evaluate-SiteCreation {
+     param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
+    )
+    
     Write-SubHeader "1. Site Creation and Structure"
     
     Write-Info "VERIFICATION STEPS:"
@@ -83,11 +88,15 @@ function Evaluate-SiteCreation {
         Write-Hint "The assignment specifically requires using logical view, not physical view."
     }
     
-    Get-Rating -Category "SiteCreation" -Prompt "Rate the site creation and structure"
-    Get-Comment -Category "SiteCreation" -Prompt "Enter any comments for this section"
+    Get-Rating -Category "SiteCreation" -Prompt "Rate the site creation and structure" -EvaluationData $EvaluationData
+    Get-Comment -Category "SiteCreation" -Prompt "Enter any comments for this section" -EvaluationData $EvaluationData
 }
 
 function Evaluate-SiteConnectivity {
+     param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
+    )
     Write-SubHeader "2. Internal Site Connectivity"
     
     Write-Info "VERIFICATION STEPS:"
@@ -143,12 +152,16 @@ function Evaluate-SiteConnectivity {
         Write-CustomError "PCs within the same site cannot communicate with each other."
         Write-Hint "Check IP addressing, subnet masks, and connectivity between devices."
     }
-    
-    Get-Rating -Category "SiteConnectivity" -Prompt "Rate the internal site connectivity"
-    Get-Comment -Category "SiteConnectivity" -Prompt "Enter any comments for this section"
+
+    Get-Rating -Category "SiteConnectivity" -Prompt "Rate the internal site connectivity" -EvaluationData $EvaluationData
+    Get-Comment -Category "SiteConnectivity" -Prompt "Enter any comments for this section" -EvaluationData $EvaluationData
 }
 
 function Evaluate-DataCentre {
+     param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
+    )
     Write-SubHeader "3. Data Centre Configuration"
     
     Write-Info "VERIFICATION STEPS:"
@@ -250,11 +263,16 @@ function Evaluate-DataCentre {
         Write-Hint "Check if the server is connected using appropriate network devices."
     }
     
-    Get-Rating -Category "DataCentre" -Prompt "Rate the data centre configuration"
-    Get-Comment -Category "DataCentre" -Prompt "Enter any comments for this section"
+    Get-Rating -Category "DataCentre" -Prompt "Rate the data centre configuration" -EvaluationData $EvaluationData
+    Get-Comment -Category "DataCentre" -Prompt "Enter any comments for this section" -EvaluationData $EvaluationData
 }
 
 function Evaluate-WANConnectivity {
+     param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
+    )
+
     Write-SubHeader "4. WAN Connectivity"
     
     Write-Info "VERIFICATION STEPS:"
@@ -343,11 +361,16 @@ function Evaluate-WANConnectivity {
         Write-Hint "Check if routers or other appropriate devices are used for WAN connectivity."
     }
     
-    Get-Rating -Category "WANConnectivity" -Prompt "Rate the WAN connectivity implementation"
-    Get-Comment -Category "WANConnectivity" -Prompt "Enter any comments for this section"
+    Get-Rating -Category "WANConnectivity" -Prompt "Rate the WAN connectivity implementation" -EvaluationData $EvaluationData
+    Get-Comment -Category "WANConnectivity" -Prompt "Enter any comments for this section" -EvaluationData $EvaluationData
 }
 
 function Evaluate-DeviceConfiguration {
+     param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
+    )
+
     Write-SubHeader "5. Intermediate Device Configuration"
     
     Write-Info "VERIFICATION STEPS:"
@@ -439,11 +462,16 @@ function Evaluate-DeviceConfiguration {
         Write-Hint "Identify specific issues in the routing or switching configuration."
     }
     
-    Get-Rating -Category "DeviceConfiguration" -Prompt "Rate the intermediate device configuration"
-    Get-Comment -Category "DeviceConfiguration" -Prompt "Enter any comments for this section"
+    Get-Rating -Category "DeviceConfiguration" -Prompt "Rate the intermediate device configuration" -EvaluationData $EvaluationData
+    Get-Comment -Category "DeviceConfiguration" -Prompt "Enter any comments for this section" -EvaluationData $EvaluationData
 }
 
 function Evaluate-WebServerAccess {
+     param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
+    )
+
     Write-SubHeader "6. Web Server Access"
     
     Write-Info "VERIFICATION STEPS:"
@@ -507,11 +535,16 @@ function Evaluate-WebServerAccess {
         Write-Hint "The server should not be accessible from outside the client's network."
     }
     
-    Get-Rating -Category "WebServerAccess" -Prompt "Rate the server access implementation"
-    Get-Comment -Category "WebServerAccess" -Prompt "Enter any comments for this section"
+    Get-Rating -Category "WebServerAccess" -Prompt "Rate the server access implementation" -EvaluationData $EvaluationData
+    Get-Comment -Category "WebServerAccess" -Prompt "Enter any comments for this section" -EvaluationData $EvaluationData
 }
 
 function Evaluate-OverallImplementation {
+     param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
+    )
+
     Write-SubHeader "7. Overall Implementation and Design"
     
     Write-Info "VERIFICATION STEPS:"
@@ -595,8 +628,8 @@ function Evaluate-OverallImplementation {
         Write-Hint "Consider whether the design shows proper application of networking principles."
     }
     
-    Get-Rating -Category "OverallImplementation" -Prompt "Rate the overall implementation and design"
-    Get-Comment -Category "OverallImplementation" -Prompt "Enter any comments for this section"
+    Get-Rating -Category "OverallImplementation" -Prompt "Rate the overall implementation and design" -EvaluationData $EvaluationData
+    Get-Comment -Category "OverallImplementation" -Prompt "Enter any comments for this section" -EvaluationData $EvaluationData
 }
 
 

@@ -66,7 +66,9 @@ function Write-Stars {
 function Get-Rating {
     param(
         [string]$Category,
-        [string]$Prompt
+        [string]$Prompt,
+        [Parameter(Mandatory=$true)] #debug
+        [hashtable]$evaluationData # New Parameter instead of global
     )
     
     Write-Host ""
@@ -76,37 +78,41 @@ function Get-Rating {
     try {
         $ratingNum = [int]$rating
         if ($ratingNum -ge 1 -and $ratingNum -le 5) {
-            $script:evaluationData.Ratings[$Category] = $ratingNum
-            $script:evaluationData.MaxPossibleScore += 5
-            $script:evaluationData.OverallScore += $ratingNum
+            $EvaluationData.Ratings[$Category] = $ratingNum
+            $EvaluationData.MaxPossibleScore += 5
+            $EvaluationData.OverallScore += $ratingNum
             Write-Stars -Count $ratingNum
             # return $ratingNum # Prevents return printing on new line.
         }
         else {
             Write-CustomError "Please enter a whole number between 1 and 5."
-            return Get-Rating -Category $Category -Prompt $Prompt
+            return Get-Rating -Category $Category -Prompt $Prompt -EvaluationData $EvaluationData
         }
     }
     catch {
         Write-CustomError "Please enter a valid whole number."
-        return Get-Rating -Category $Category -Prompt $Prompt
+        return Get-Rating -Category $Category -Prompt $Prompt -EvaluationData $EvaluationData
     }
 }
 
 function Get-Comment {
     param(
         [string]$Category,
-        [string]$Prompt
+        [string]$Prompt,
+         [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData # New Parameter instead of global
     )
     
     Write-Host ""
     Write-Host "  $Prompt (press Enter to skip): " -ForegroundColor White -NoNewline
     $comment = Read-Host
     
-    if (-not [string]::IsNullOrWhiteSpace($comment)) {
-        $script:evaluationData.Comments[$Category] = $comment
+     if (-not [string]::IsNullOrWhiteSpace($comment)) {
+        if ($null -eq $EvaluationData.Comments) {
+            $EvaluationData.Comments = @{}
+        }
+        $EvaluationData.Comments[$Category] = $comment
     }
-    
     return $comment
 }
 

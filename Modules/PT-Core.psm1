@@ -10,16 +10,54 @@ $script:config = @{
     CommandReferences = @{}
 }
 
-# Evaluation data hashtable
-$script:evaluationData = @{
-    StudentName = ""
-    StudentID = ""
-    SubmissionFile = ""
-    Ratings = @{}
-    Comments = @{}
-    OverallScore = 0
-    MaxPossibleScore = 0
-    StartTime = Get-Date
+# # Evaluation data hashtable
+# $script:evaluationData = @{
+#     StudentName = ""
+#     StudentID = ""
+#     SubmissionFile = ""
+#     Ratings = @{}
+#     Comments = @{}
+#     OverallScore = 0
+#     MaxPossibleScore = 0
+#     StartTime = Get-Date
+# }
+
+function Initialise-Evaluation {
+    Clear-Host
+    Write-Header "Packet Tracer Assignment Evaluation Tool"
+    
+    Write-Info "This tool will guide you through evaluating a student's Packet Tracer submission."
+    Write-Info "For each section, you'll check specific requirements and assign a rating from 1-5."
+    Write-Info "Enter '?' at any prompt to view the command reference guide."
+    
+    Write-SubHeader "Student Information"
+    
+    Write-Host "  Student Name: " -NoNewline
+    $studentName = Read-Host
+    
+    Write-Host "  Student ID: " -NoNewline
+    $studentID = Read-Host
+    
+    # Call the existing Initialise-Assessment function with collected parameters
+    # $evaluationData = Initialise-Assessment -StudentName $studentName -StudentID $studentID
+    
+    # Write-Host "  Setting Submission file to: $($evaluationData.SubmissionFile)"
+    
+# Create a new evaluation data object
+    $evaluationData = @{
+        StudentName = $studentName
+        StudentID = $studentID
+        SubmissionFile = $studentID
+        Ratings = @{}
+        Comments = @{}
+        OverallScore = 0
+        MaxPossibleScore = 0
+        StartTime = Get-Date
+    }
+
+    Write-Success "Evaluation initialised. Begin the assessment."
+    
+    return $evaluationData
 }
 
 # Function to load assessment template from JSON file
@@ -71,25 +109,39 @@ function Initialise-Assessment {
     $script:evaluationData.MaxPossibleScore = 0
     $script:evaluationData.StartTime = Get-Date
     
+    Write-Host "$script:evaluationData.studentName"
     return $script:evaluationData
 }
 
-# Check if evaluation been initialised
+# Check if evaluation been initialised. Active evaluation
 function Is-EvaluationInitialised {
-    if (-not $script:evaluationData -or -not $script:evaluationData.StudentID) {
-        return $false
+    param(
+        [Parameter(Mandatory=$false)]
+        [hashtable]$EvaluationData = $null
+    )
+    
+    # Check param if provided
+    if ($null -ne $EvaluationData -and $null -ne $EvaluationData.StudentID) {
+        return $true
     }
-    return $true
+    
+    # Fall back to old scope - backwards from older code.
+    if ($script:activeEvaluation -and $script:activeEvaluation.StudentID) {
+        return $true
+    }
+    return $false
 }
 
 # Save assessment data to a file
 function Save-AssessmentData {
     param(
-        [string]$Path
+        [string]$Path,
+        [Parameter(Mandatory=$true)]
+        [hashtable]$EvaluationData
     )
     
     try {
-        $script:evaluationData | ConvertTo-Json -Depth 5 | Out-File -FilePath $Path -Encoding utf8 -Force
+        $EvaluationData | ConvertTo-Json -Depth 5 | Out-File -FilePath $Path -Encoding utf8 -Force
         return $true
     }
     catch {
@@ -99,44 +151,44 @@ function Save-AssessmentData {
 
 # Load assessment data from a file
 function Load-AssessmentData {
-    param(
-        [string]$Path
-    )
+    param([string]$Path)
     
     if (Test-Path $Path) {
         try {
             $savedData = Get-Content -Path $Path -Raw | ConvertFrom-Json
             
-            # Convert from JSON to hashtable
-            $script:evaluationData.StudentName = $savedData.StudentName
-            $script:evaluationData.StudentID = $savedData.StudentID
-            $script:evaluationData.SubmissionFile = $savedData.SubmissionFile
-            $script:evaluationData.Ratings = @{}
-            $script:evaluationData.Comments = @{}
-            $script:evaluationData.OverallScore = $savedData.OverallScore
-            $script:evaluationData.MaxPossibleScore = $savedData.MaxPossibleScore
-            $script:evaluationData.StartTime = [datetime]$savedData.StartTime
+            # Create a new hashtable
+            $evaluationData = @{
+                StudentName = $savedData.StudentName
+                StudentID = $savedData.StudentID
+                SubmissionFile = $savedData.SubmissionFile
+                Ratings = @{}
+                Comments = @{}
+                OverallScore = $savedData.OverallScore
+                MaxPossibleScore = $savedData.MaxPossibleScore
+                StartTime = [datetime]$savedData.StartTime
+            }
             
             # Convert ratings and comments
             foreach ($key in $savedData.Ratings.PSObject.Properties.Name) {
-                $script:evaluationData.Ratings[$key] = $savedData.Ratings.$key
+                $evaluationData.Ratings[$key] = $savedData.Ratings.$key
             }
             
             foreach ($key in $savedData.Comments.PSObject.Properties.Name) {
-                $script:evaluationData.Comments[$key] = $savedData.Comments.$key
+                $evaluationData.Comments[$key] = $savedData.Comments.$key
             }
             
-            return $true
+            return $evaluationData
         }
         catch {
-            return $false
+            return $null
         }
     }
     else {
-        return $false
+        return $null
     }
 }
 
 # Export module members
 Export-ModuleMember -Variable config, evaluationData
-Export-ModuleMember -Function Load-AssessmentTemplate, Initialise-Assessment, Is-EvaluationInitialised, Save-AssessmentData, Load-AssessmentData
+Export-ModuleMember -Function Load-AssessmentTemplate, Initialise-Assessment, Is-EvaluationInitialised, Save-AssessmentData, Load-AssessmentData, Initialise-Evaluation

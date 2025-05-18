@@ -8,14 +8,8 @@
     Version: 3.0
 #>
 
-# Import Modules
-# Import-Module .\PT-Core.psm1
-# Import-Module .\PT-UI.psm1
-# Import-Module .\PT-Evaluation.psm1
-# Import-Module .\PT-Reference.psm1
-# Import-Module .\PT-Reporting.psm1
+$script:activeEvaluation = $null 
 
-# $modulePath = Join-Path -Path $PSScriptRoot -ChildPath "Modules" 
 
 # Import all modules in the Modules directory
 function Import-PTModule{
@@ -35,6 +29,7 @@ function Import-PTModule{
         if($loadedModule) {
             Write-Host "Successfully imported module: $modulePath" -ForegroundColor Green
                 # Debug - List Export Functions
+                # $exportedCommands = Get-Command -Module $loadedModule.Name
                 # $exportedCommands = Get-Command -Module $loadedModule.Name
                 # Write-Host "Exported functions: $($exportedCommands | ForEach-Object { $_.Name })" -ForegroundColor Green 
             return $true
@@ -126,7 +121,7 @@ function Show-ReferenceOptions {
     Write-Info "0. Exit"
 }
 
-# Initialise template
+# Initialise templates
 function Initialise-Template {
    if(-not $script:config -or -not $script:config.TemplateName){
     # check if exists
@@ -160,19 +155,19 @@ function Process-MenuChoice {
     
     switch ($Choice) {
         # Assessment
-        "1" { Initialise-Assessment}
-        "2" { Invoke-CategoryEvaluation -CategoryID "SiteCreation" }
-        "3" { Invoke-CategoryEvaluation -CategoryID "SiteConnectivity" }
-        "4" { Invoke-CategoryEvaluation -CategoryID "DataCentre" }
-        "5" { Invoke-CategoryEvaluation -CategoryID "WANConnectivity" }
-        "6" { Invoke-CategoryEvaluation -CategoryID "DeviceConfiguration" }
-        "7" { Invoke-CategoryEvaluation -CategoryID "WebServerAccess" }
-        "8" { Invoke-CategoryEvaluation -CategoryID "OverallImplementation" }
-        
-        # Reporting
-        "9" { Invoke-ReportAction -Action "Generate"; $showContinuePrompt = $false }
-        "10" { Invoke-ReportAction -Action "Export"; $showContinuePrompt = $false }
-        "11" { Invoke-ReportAction -Action "Preview"; $showContinuePrompt = $false }
+        "1" { $script:activeEvaluation = Initialise-Evaluation}
+        "2" { Invoke-CategoryEvaluation -CategoryID "SiteCreation" -EvaluationData $script:activeEvaluation }
+        "3" { Invoke-CategoryEvaluation -CategoryID "SiteConnectivity" -EvaluationData $script:activeEvaluation }
+        "4" { Invoke-CategoryEvaluation -CategoryID "DataCentre" -EvaluationData $script:activeEvaluation }
+        "5" { Invoke-CategoryEvaluation -CategoryID "WANConnectivity" -EvaluationData $script:activeEvaluation }
+        "6" { Invoke-CategoryEvaluation -CategoryID "DeviceConfiguration" -EvaluationData $script:activeEvaluation }
+        "7" { Invoke-CategoryEvaluation -CategoryID "WebServerAccess" -EvaluationData $script:activeEvaluation }
+        "8" { Invoke-CategoryEvaluation -CategoryID "OverallImplementation" -EvaluationData $script:activeEvaluation }
+
+        # Reporting - Pass evluation data
+        "9" { Invoke-ReportAction -Action "Generate" -EvaluationData $script:activeEvaluation; $showContinuePrompt = $false }
+        "10" { Invoke-ReportAction -Action "Export" -EvaluationData $script:activeEvaluation; $showContinuePrompt = $false }
+        "11" { Invoke-ReportAction -Action "Preview" -EvaluationData $script:activeEvaluation; $showContinuePrompt = $false }
         
         # Reference
         "12" { Show-AppropriateCommandReference }
@@ -196,47 +191,58 @@ function Process-MenuChoice {
 }
 
 # Invoke evaluation function
+# This function redirects evaluation to the appropriate category handler
+# and passes the global activeEvaluation data to each function
 function Invoke-CategoryEvaluation {
     param([string]$CategoryID)
     
-    if (-not (Is-EvaluationInitialised)) {
+    # Check if evaluation is initialised without requiring a parameter
+    if (-not $script:activeEvaluation -or -not $script:activeEvaluation.StudentID) {
         Write-CustomError "Please initialise an evaluation first (option 1)"
         return
     }
     
+    # Handle different template types
     if ($script:config.Template -eq "Dynamic") {
-        Evaluate-Category -CategoryID $CategoryID
+        # For dynamic templates, pass the category ID and evaluation data
+        Evaluate-Category -CategoryID $CategoryID -EvaluationData $script:activeEvaluation
     } else {
-        # Call static evaluation function
+        # For static templates, call the specific evaluation function
+        # Pass activeEvaluation to each evaluation function
         switch ($CategoryID) {
-            "SiteCreation" { Evaluate-SiteCreation }
-            "SiteConnectivity" { Evaluate-SiteConnectivity }
-            "DataCentre" { Evaluate-DataCentre }
-            "WANConnectivity" { Evaluate-WANConnectivity }
-            "DeviceConfiguration" { Evaluate-DeviceConfiguration }
-            "WebServerAccess" { Evaluate-WebServerAccess }
-            "OverallImplementation" { Evaluate-OverallImplementation }
+            "SiteCreation" { Evaluate-SiteCreation -EvaluationData $script:activeEvaluation }
+            "SiteConnectivity" { Evaluate-SiteConnectivity -EvaluationData $script:activeEvaluation }
+            "DataCentre" { Evaluate-DataCentre -EvaluationData $script:activeEvaluation }
+            "WANConnectivity" { Evaluate-WANConnectivity -EvaluationData $script:activeEvaluation }
+            "DeviceConfiguration" { Evaluate-DeviceConfiguration -EvaluationData $script:activeEvaluation }
+            "WebServerAccess" { Evaluate-WebServerAccess -EvaluationData $script:activeEvaluation }
+            "OverallImplementation" { Evaluate-OverallImplementation -EvaluationData $script:activeEvaluation }
         }
     }
 }
 
 # Invoke report action
 function Invoke-ReportAction {
-    param([string]$Action)
-    
-    if (-not (Is-EvaluationInitialised)) {
+   param(
+        [string]$Action,
+        [Parameter(Mandatory=$false)]
+        [hashtable]$EvaluationData = $script:activeEvaluation
+    )
+
+    # Pass the evaluation data explicitly
+    if (-not (Is-EvaluationInitialised -EvaluationData $EvaluationData)) {
         Write-CustomError "Please initialise and complete an evaluation first"
         return
     }
     
     # common parameters
-    $commonParams = @{
-        EvaluationData = $script:evaluationData
+      $commonParams = @{
+        EvaluationData = $EvaluationData
         FormatCategoryName = ${function:Format-CategoryName}
     }
     
     # UI functions for actions
-    $displayParams = $commonParams.Clone()
+     $displayParams = $commonParams.Clone()
     $displayParams.Add("WriteHeader", ${function:Write-Header})
     $displayParams.Add("WriteSubHeader", ${function:Write-SubHeader})
     $displayParams.Add("WriteInfo", ${function:Write-Info})
@@ -244,7 +250,7 @@ function Invoke-ReportAction {
     $displayParams.Add("WriteCustomError", ${function:Write-CustomError})
     
     # action, do
-    switch ($Action) {
+     switch ($Action) {
         "Generate" {
             Generate-SummaryReport @displayParams
         }
@@ -252,7 +258,7 @@ function Invoke-ReportAction {
             $scoreData = Calculate-AssessmentScores @commonParams
             $feedbackItems = Generate-FeedbackRecommendations @commonParams
             $reportContent = Prepare-ReportContent -ScoreData $scoreData -FeedbackItems $feedbackItems @commonParams
-            $exportResult = Export-ReportToFile -StudentID $script:evaluationData.StudentID -ReportContent $reportContent
+            $exportResult = Export-ReportToFile -StudentID $EvaluationData.StudentID -ReportContent $reportContent
             
             if ($exportResult.Success) {
                 Write-Success "Report exported to $($exportResult.FileName)"
